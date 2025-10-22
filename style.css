@@ -1,0 +1,154 @@
+/* static/style.css (PARTIE 1) - début */
+:root{
+  --bg:#f0f2f5;
+  --card:#ffffff;
+  --accent:#1877f2;
+  --muted:#777;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:var(--bg);
+  color:#111;
+}
+.app{
+  max-width:1100px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+.app-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 16px;
+  background:var(--card);
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  position:fixed;
+  width: 100%;
+  top:0;
+  z-index:20;
+}
+.masque {
+  margin-bottom: 25px;
+}
+.logo{font-weight:bold;color:var(--accent)}
+.status{font-size:0.85rem;padding:6px 10px;border-radius:14px}
+.status.off{background:#ffecec;color:#a00}
+.status.on{background:#e6fbff;color:#007}
+.main{
+  display:flex;
+  gap:12px;
+  padding:12px;
+  flex:1;
+}
+/* sidebar */
+.sidebar{
+  width:260px;
+  min-width:200px;
+  background:var(--card);
+  border-radius:10px;
+  padding:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  height:calc(100vh - 140px);
+  overflow:auto;
+}
+.user-box input{width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #ddd}
+.user-box button{width:100%;padding:8px;margin-top:8px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer}
+.users-list{margin-top:16px}
+.users-list ul{list-style:none;padding:0;margin:0}
+.users-list li{padding:8px;border-radius:8px;margin-bottom:6px;background:#f7f7f7;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.users-list li.me{background:#dfefff}
+/* chat area */
+.messages{
+  background:transparent;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:12px;
+  height:calc(100vh - 220px);
+  overflow:auto;
+}
+/* message bubble */
+.msg{
+  max-width:78%;
+  padding:8px 12px;
+  border-radius:14px;
+  word-break:break-word;
+}
+.msg.system{max-width:100%;background:#fff7d6;color:#665500;font-size:0.9rem}
+.msg.me{margin-left:auto;background:var(--accent);color:white}
+.msg.them{margin-right:auto;background:#eef2f7;color:#111}
+.composer{
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:transparent;
+  align-items:center;
+  border-top:1px solid rgba(0,0,0,0.05);
+}
+/* responsive */
+@media (max-width:900px){
+  .main{flex-direction:column}
+  .sidebar{width:100%;height:auto}
+  .messages{height:45vh}
+  .composer{position:sticky;bottom:0;background:var(--card)}
+}
+/* static/style.css (PARTIE 2) - complément (si besoin) */
+/* (les règles principales étaient définies dans PARTIE 1) */
+/* Ajouts : composer responsive */
+.composer select, .composer input{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-size:1rem;
+  width: 130px;
+}
+.composer button{
+  background:var(--accent);
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.messages .msg small{display:block;color:#3ce3ff;font-size:0.8rem;margin-bottom:6px}
+#btnRefresh {
+  background: #b5daffaa;
+  border:none;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+
+
+.conteneur {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: rgba(0,0,0,0.5);
+      align-content: center;
+      display: none;
+      z-index: 100;
+    }
+    .alert {
+      background: white;
+      width: 70%;
+      margin: auto;
+      text-align: center;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 20px;
+    }
+    .alert button {
+      width: 100%;
+      font-size: 15px;
+      border-radius: 10px;
+      padding: 5px;
+      border: none;
+      margin-top: 10px;
+    }

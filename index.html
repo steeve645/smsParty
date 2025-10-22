@@ -1,0 +1,76 @@
+<!-- templates/index.html  (PARTIE 1) -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Echange de sms</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="conteneur" id="conteneur">
+    <div class="alert">
+      <div id="message">
+        <p>Alert</p>
+      </div>
+      <div class="button">
+        <button onclick="remove()">OK
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="app">
+    <header class="app-header">
+      <div class="logo">SMS Party</div>
+      <div id="connectionStatus" class="status off">Hors-ligne 🔴</div>
+    </header>
+    <div class="masque">A</div>
+
+    <main class="main">
+      <aside class="sidebar">
+        <div class="user-box">
+          <label for="username">Ton pseudo</label>
+          <input id="username" placeholder="Ton pseudo..." maxlength="13" minlength="5">
+          <button id="btnRegister">Entrer</button>
+        </div>
+
+        <div class="users-list">
+          <h4>Utilisateurs connectés</h4>
+          <ul id="users"></ul>
+        </div>
+
+        <div class="controls">
+          <button id="btnRefresh">Rafraîchir</button>
+          <small class="hint">Connecte-toi au même Wi-Fi / hotspot</small>
+        </div>
+      </aside>
+
+      <section class="chat-area">
+        <div id="messages" class="messages"></div>
+
+        <div class="composer">
+          <select id="recipient">
+            <option value="public">Tout le monde (public)</option>
+          </select>
+          <input id="messageInput" placeholder="Écris un message..." maxlength="1000" />
+          <button id="sendBtn">Envoyer</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bottom">
+      <small>Serveur local — pas besoin d'internet</small>
+    </footer>
+  </div>
+
+  <script>
+    
+    // initialisation minimale côté client — suite dans static/script.js (PARTIE 2)
+    // Nous allons charger le script principal depuis /static/script.js
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="/static/script.js"></script>
+</body>
+</html>
