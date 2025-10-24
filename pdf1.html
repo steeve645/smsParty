@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Recherche dans un PDF local</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #pdf-container {
+      margin-top: 20px;
+      display: inline-block;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      text-align: left;
+      max-width: 90%;
+      transition: 0.3s ease;
+    }
+
+    #search-box {
+      margin-top: 20px;
+    }
+
+    mark {
+      background: yellow;
+      color: black;
+      font-weight: bold;
+    }
+
+    input[type="file"], input[type="text"], button {
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      font-size: 15px;
+    }
+    input[type="file"]::file-selector-button {
+      background-color: #28a745; /* couleur de fond */
+      color: white;              /* couleur du texte */
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+}
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: #1e7e34; /* couleur au survol */
+}
+
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .page-box {
+      margin: 15px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .no-result {
+      font-style: italic;
+      color: #888;
+      margin-top: 20px;
+    }
+
+    #toggle-all {
+      background-color: #28a745;
+      margin-top: 10px;
+    }
+
+    #toggle-all:hover {
+      background-color: #1e7e34;
+    }
+
+    #result-count {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Recherche dans un PDF local</h1>
+
+  <input type="file" id="pdf-upload" accept="application/pdf"><br>
+  <div id="search-box">
+    <input type="text" id="search" placeholder="Rechercher un mot...">
+    <button id="search-btn">Rechercher</button>
+    <button id="toggle-all" style="display:none;">Afficher tout le PDF</button>
+  </div>
+
+  <div id="result-count"></div>
+  <div id="pdf-container">Aucun fichier chargé.</div>
+
+  <script>
+    const pdfContainer = document.getElementById('pdf-container');
+    const fileInput = document.getElementById('pdf-upload');
+    const searchInput = document.getElementById('search');
+    const searchButton = document.getElementById('search-btn');
+    const toggleAllButton = document.getElementById('toggle-all');
+    const resultCount = document.getElementById('result-count');
+
+    let pdfDoc = null;
+    let pagesText = [];
+    let showingAll = false;
+
+    // Charger le PDF choisi localement
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+
+      reader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        pdfDoc = await pdfjsLib.getDocument({ data: typedarray }).promise;
+
+        pagesText = [];
+        pdfContainer.innerHTML = "<p>Chargement du texte du PDF...</p>";
+
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const text = await page.getTextContent();
+          const pageText = text.items.map(item => item.str).join(' ');
+          pagesText.push({ page: i, text: pageText });
+        }
+
+        pdfContainer.innerHTML = `<p>✅ PDF chargé (${pdfDoc.numPages} pages). Tape un mot pour chercher.</p>`;
+        toggleAllButton.style.display = "inline-block";
+        toggleAllButton.textContent = " Afficher tout le PDF";
+        showingAll = false;
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // Fonction de recherche et affichage des pages concernées
+    searchButton.addEventListener('click', () => {
+      const query = searchInput.value.trim();
+      if (!query) return alert("⚠️ Tape un mot à rechercher !");
+      if (!pdfDoc) return alert("⚠️ Choisis d'abord un fichier PDF.");
+
+      let totalOccurrences = 0;
+      const results = [];
+      const regex = new RegExp(`(${query})`, 'gi');
+
+      pagesText.forEach(p => {
+        const matches = p.text.match(regex);
+        if (matches) {
+          totalOccurrences += matches.length;
+          let highlighted = p.text.replace(regex, '<mark>$1</mark>');
+          results.push(`<div class="page-box"><h3>📄 Page ${p.page}</h3><p>${highlighted}</p></div>`);
+        }
+      });
+
+      if (results.length > 0) {
+        pdfContainer.innerHTML = results.join('');
+        resultCount.innerHTML = `🔎 ${totalOccurrences} occurrence(s) trouvée(s) sur ${results.length} page(s).`;
+      } else {
+        pdfContainer.innerHTML = `<p class="no-result">❌ Aucun résultat trouvé pour "<b>${query}</b>".</p>`;
+        resultCount.innerHTML = '';
+      }
+
+      showingAll = false;
+      toggleAllButton.textContent = "️Afficher tout le PDF";
+    });
+
+    // Bouton pour afficher / masquer tout le PDF
+    toggleAllButton.addEventListener('click', () => {
+      if (!pdfDoc) return;
+      if (showingAll) {
+        pdfContainer.innerHTML = `<p>✅ PDF chargé (${pdfDoc.numPages} pages). Tape un mot pour chercher.</p>`;
+        toggleAllButton.textContent = " Afficher tout le PDF";
+        resultCount.innerHTML = '';
+        showingAll = false;
+      } else {
+        let allPagesHTML = '';
+        pagesText.forEach(p => {
+          allPagesHTML += `<div class="page-box"><h3>📄 Page ${p.page}</h3><p>${p.text}</p></div>`;
+        });
+        pdfContainer.innerHTML = allPagesHTML;
+        toggleAllButton.textContent = "Masquer le contenu";
+        resultCount.innerHTML = '';
+        showingAll = true;
+      }
+    });
+  </script>
+</body>
+</html>
